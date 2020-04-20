@@ -1,0 +1,34 @@
+version: "3"
+services:
+        nginx:
+                image: nginx
+                depends_on:
+                        - php
+                ports:
+                        - "8080:80"
+                volumes:
+                        - ./nginx/conf.d/:/etc/nginx/conf.d
+                        - ./public:/usr/share/nginx/html
+                        - ./logs/nginx-access.log:/var/log/nginx/access.log
+                        - ./logs/nginx-error.log:/var/log/nginx/error.log
+        php:
+                build: ./php/
+                expose:
+                        - 9000
+                volumes:
+                        - ./public:/usr/share/nginx/html
+        mysql:
+                image: mariadb
+                volumes:
+                  - ./data:/var/lib/mysql
+                env_file:
+                        - ./env/mysql.env
+        phpmyadmin:
+                image: phpmyadmin/phpmyadmin
+                restart: always
+                depends_on:
+                        - mysql
+                ports:
+                        - "8081:80"
+                env_file:
+                        - ./env/mysql.env
